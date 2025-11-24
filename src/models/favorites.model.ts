@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 import { FavoriteType, ForecastItem } from "../types/favorite.types.js";
 
-export interface FavoriteDocument extends FavoriteType, Document {}
+export interface FavoriteDocument extends FavoriteType, Document { }
 
 const ForecastSchema = new Schema<ForecastItem>({
     date: { type: String, required: true },
