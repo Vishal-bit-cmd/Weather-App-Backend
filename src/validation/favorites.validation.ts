@@ -9,11 +9,5 @@ export const addFavoriteSchema = Joi.object({
     country: Joi.string().required().messages({
         "string.base": "Country must be text",
         "any.required": "Country is required",
-    }),
-
-    forecast: Joi.array().min(1).required().messages({
-        "array.base": "Forecast must be an array",
-        "array.min": "Forecast cannot be empty",
-        "any.required": "Forecast is required",
-    }),
+    })
 });

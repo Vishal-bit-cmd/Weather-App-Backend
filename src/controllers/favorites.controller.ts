@@ -4,7 +4,11 @@ import { fetch5DayForecast } from "../utils/weather.js";
 
 export const addFavorite = async (req: Request, res: Response) => {
     try {
-        const { name, country, forecast } = req.body;
+        const { name, country } = req.body;
+
+        if (!name) {
+            return res.status(400).json({ message: "City name is required" });
+        }
 
         const exists = await Favorite.findOne({
             name: { $regex: new RegExp(`^${name}$`, "i") }
@@ -13,6 +17,8 @@ export const addFavorite = async (req: Request, res: Response) => {
         if (exists) {
             return res.status(409).json({ message: "Already added to favorites" });
         }
+
+        const forecast = await fetch5DayForecast(name);
 
         const fav = await Favorite.create({ name, country, forecast });
 
@@ -41,6 +47,7 @@ export const getFavoriteById = async (req: Request, res: Response) => {
         const today = new Date();
         const diffDays = (today.getTime() - lastDate.getTime()) / (1000 * 3600 * 24);
 
+        // ⏳ If forecast is old → refresh using backend API
         if (diffDays >= 1) {
             const updatedForecast = await fetch5DayForecast(favorite.name);
             favorite.forecast = updatedForecast;
@@ -54,7 +61,6 @@ export const getFavoriteById = async (req: Request, res: Response) => {
         return res.status(500).json({ error: err.message });
     }
 };
-
 
 export const deleteFavorite = async (req: Request, res: Response) => {
     try {
