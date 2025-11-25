@@ -7,6 +7,6 @@ const router = Router();
 
 router.get("/", getAllCities);
 router.get("/search", validateQuery(searchCitySchema), searchCity);
-router.get("/:name", getCityByName);   // fetch city directly by name
+router.get("/:name", getCityByName);  
 
 export default router;

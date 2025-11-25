@@ -1,9 +1,14 @@
 import Favorite from "../models/favorites.model.js";
 import { fetch5DayForecast } from "../utils/weather.js";
 
-export const addFavoriteService = async (name: string, country: string) => {
+export const addFavoriteService = async (
+    name: string,
+    country: string,
+    userId: string
+) => {
     const exists = await Favorite.findOne({
-        name: { $regex: new RegExp(`^${name}$`, "i") }
+        name: { $regex: new RegExp(`^${name}$`, "i") },
+        userId
     });
 
     if (exists) {
@@ -13,16 +18,16 @@ export const addFavoriteService = async (name: string, country: string) => {
     }
 
     const forecast = await fetch5DayForecast(name);
-    return await Favorite.create({ name, country, forecast });
+
+    return await Favorite.create({ name, country, forecast, userId });
 };
 
-export const getFavoritesService = async () => {
-    return await Favorite.find().sort({ name: 1 });
+export const getFavoritesService = async (userId: string) => {
+    return await Favorite.find({ userId }).sort({ name: 1 });
 };
 
-export const getFavoriteByIdService = async (id: string) => {
-    const favorite = await Favorite.findById(id);
-
+export const getFavoriteByIdService = async (id: string, userId: string) => {
+    const favorite = await Favorite.findOne({ _id: id, userId });
     if (!favorite) {
         const err: any = new Error("Favorite city not found");
         err.statusCode = 404;
@@ -42,8 +47,8 @@ export const getFavoriteByIdService = async (id: string) => {
     return { from: "database", favorite };
 };
 
-export const deleteFavoriteService = async (id: string) => {
-    const deleted = await Favorite.findByIdAndDelete(id);
+export const deleteFavoriteService = async (id: string, userId: string) => {
+    const deleted = await Favorite.findOneAndDelete({ _id: id, userId });
     if (!deleted) {
         const err: any = new Error("Favorite city not found");
         err.statusCode = 404;

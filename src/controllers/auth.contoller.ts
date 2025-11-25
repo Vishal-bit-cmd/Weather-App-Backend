@@ -29,7 +29,7 @@ export const login = async (req: Request, res: Response) => {
     res.cookie("refreshToken", refresh, {
         httpOnly: true,
         secure: false,
-        sameSite: "lax",
+        sameSite: "none",
         path: "/",
         maxAge: 7 * 24 * 60 * 60 * 1000
     });
