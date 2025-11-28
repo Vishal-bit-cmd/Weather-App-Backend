@@ -1,48 +1,44 @@
-import type { Response, NextFunction } from "express";
-import { AuthRequest } from "../middleware/auth.js";
+import { AuthRequest } from "../middleware/auth";
+import { Response } from "express";
 import {
     addFavoriteService,
     getFavoritesService,
-    getFavoriteByIdService,
-    deleteFavoriteService
+    deleteFavoriteService,
 } from "../services/favorites.service.js";
 
-export const addFavorite = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const addFavorite = async (req: AuthRequest, res: Response) => {
     try {
-        const userId = req.user!._id;
-        const favorite = await addFavoriteService(req.body.name, req.body.country, userId);
-        res.status(201).json({ favorite });
-    } catch (err) {
-        next(err);
+        const { name, country } = req.body;
+
+        if (!name || !country) {
+            return res.status(400).json({ message: "Name and country are required" });
+        }
+
+        const favorite = await addFavoriteService(name, country, req.user!.id);
+
+        return res.status(201).json(favorite);
+
+    } catch (err: any) {
+        return res.status(400).json({ message: err.message || "Failed to add favorite" });
     }
 };
 
-export const getFavorites = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const getFavorites = async (req: AuthRequest, res: Response) => {
     try {
-        const userId = req.user!._id;
-        const favorites = await getFavoritesService(userId);
-        res.json(favorites);
-    } catch (err) {
-        next(err);
+        const favorites = await getFavoritesService(req.user!.id);
+        return res.json(favorites);
+
+    } catch (err: any) {
+        return res.status(500).json({ message: "Failed to fetch favorites" });
     }
 };
 
-export const getFavoriteById = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const deleteFavorite = async (req: AuthRequest, res: Response) => {
     try {
-        const userId = req.user!._id;
-        const result = await getFavoriteByIdService(req.params.id, userId);
-        res.json(result);
-    } catch (err) {
-        next(err);
-    }
-};
+        const deleted = await deleteFavoriteService(req.params.id, req.user!.id);
+        return res.json({ message: "Deleted", deleted });
 
-export const deleteFavorite = async (req: AuthRequest, res: Response, next: NextFunction) => {
-    try {
-        const userId = req.user!._id;
-        await deleteFavoriteService(req.params.id, userId);
-        res.json({ message: "Favorite removed" });
-    } catch (err) {
-        next(err);
+    } catch (err: any) {
+        return res.status(404).json({ message: err.message || "Favorite not found" });
     }
 };

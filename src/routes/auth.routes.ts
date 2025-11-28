@@ -1,14 +1,12 @@
 import { Router } from "express";
-import { register, login, refreshAccess, logout } from "../controllers/auth.contoller.js";
-import { validate } from "../middleware/favorite.validate.js";
-import { registerSchema, loginSchema } from "../validation/auth.validation.js";
-import { validateRefresh } from "../middleware/refresh.validate.js";
+import { register, login, refreshAccess, profile, logout } from "../controllers/auth.controller.js";
 
 const router = Router();
 
-router.post("/register", validate(registerSchema), register);
-router.post("/login", validate(loginSchema), login);
-router.get("/refresh", validateRefresh, refreshAccess);
+router.post("/register", register);
+router.post("/login", login);
+router.get("/profile", profile);
+router.get("/refresh", refreshAccess);
 router.post("/logout", logout);
 
 export default router;

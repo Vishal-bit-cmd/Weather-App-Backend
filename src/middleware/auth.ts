@@ -1,30 +1,31 @@
-import type { Request, Response, NextFunction } from "express";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
+import { Request, Response, NextFunction } from "express";
 
-// Extend Express Request type
 export interface AuthRequest extends Request {
-    user?: { _id: string; role: string; name?: string };
+    user?: { id: string; role: string };
 }
 
-export const auth = (req: Request, res: Response, next: NextFunction) => {
-    const header = req.headers.authorization;
-    if (!header) return res.status(401).json({ message: "No token provided" });
+export const authenticate = (req: AuthRequest, res: Response, next: NextFunction) => {
+    const token = req.cookies.accessToken;
 
-    const token = header.split(" ")[1];
-    if (!token) return res.status(401).json({ message: "Token missing" });
+    if (!token) {
+        return res.status(401).json({ message: "Not authenticated" });
+    }
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET!) as JwtPayload & {
-            _id: string;
-            role: string;
-            name?: string;
+        const decoded = jwt.verify(
+            token,
+            process.env.JWT_ACCESS_SECRET!
+        ) as any;
+
+        req.user = {
+            id: decoded.id,
+            role: decoded.role
         };
 
-        // Type assertion here avoids Express type mismatch
-        (req as AuthRequest).user = { _id: decoded._id, role: decoded.role, name: decoded.name };
-
         next();
-    } catch {
-        return res.status(403).json({ message: "Invalid or expired token" });
+    } catch (err) {
+        return res.status(401).json({ message: "Invalid or expired token" });
     }
 };
+

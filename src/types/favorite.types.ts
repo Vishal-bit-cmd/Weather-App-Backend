@@ -10,6 +10,7 @@ export interface ForecastItem {
 }
 
 export interface FavoriteType {
+    user: string
     name: string;
     country: string;
     forecast: ForecastItem[];

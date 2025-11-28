@@ -1,9 +1,16 @@
-import type { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
+import { AuthRequest } from "../types/auth.types";
 
-export const allow = (...roles: string[]) => {
-    return (req: Request, res: Response, next: NextFunction) => {
-        const role = (req as any).user.role;
-        if (!roles.includes(role)) return res.status(403).json({ message: "Forbidden" });
-        next();
-    };
-};
+export const authorize =
+    (roles: ("user" | "admin")[]) =>
+        (req: AuthRequest, res: Response, next: NextFunction) => {
+            if (!req.user) {
+                return res.status(401).json({ message: "Not authenticated" });
+            }
+
+            if (!roles.includes(req.user.role)) {
+                return res.status(403).json({ message: "Access denied: insufficient role" });
+            }
+
+            next();
+        };

@@ -1,7 +1,8 @@
 import type { Request, Response, NextFunction } from "express";
-import { searchCityService, getAllCitiesService, getCityByNameService } from "../services/city.service.js";
+import { searchCityService, getCityByNameService } from "../services/city.service.js";
+import { AuthRequest } from "../middleware/auth.js";
 
-export const searchCity = async (req: Request, res: Response, next: NextFunction) => {
+export const searchCity = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const q = req.query.q as string;
         const result = await searchCityService(q);
@@ -11,7 +12,7 @@ export const searchCity = async (req: Request, res: Response, next: NextFunction
     }
 };
 
-export const getCityByName = async (req: Request, res: Response, next: NextFunction) => {
+export const getCityByName = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const name = req.params.name;
         const city = await getCityByNameService(name);
@@ -21,11 +22,3 @@ export const getCityByName = async (req: Request, res: Response, next: NextFunct
     }
 };
 
-export const getAllCities = async (_req: Request, res: Response, next: NextFunction) => {
-    try {
-        const cities = await getAllCitiesService();
-        res.json(cities);
-    } catch (err) {
-        next(err);
-    }
-};

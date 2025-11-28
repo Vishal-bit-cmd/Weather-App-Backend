@@ -52,7 +52,3 @@ export const getCityByNameService = async (name: string) => {
     return city;
 };
 
-
-export const getAllCitiesService = async () => {
-    return await City.find().sort({ name: 1 });
-};

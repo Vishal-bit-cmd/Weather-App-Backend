@@ -1,9 +1,15 @@
-import jwt from "jsonwebtoken";
+export const setTokenCookies = (res: any, access: string, refresh: string) => {
+    res.cookie("accessToken", access, {
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
+        maxAge: 15 * 60 * 1000
+    });
 
-export const generateAccessToken = (payload: object) => {
-    return jwt.sign(payload, process.env.JWT_ACCESS_SECRET!, { expiresIn: "15m" });
-};
-
-export const generateRefreshToken = (payload: object) => {
-    return jwt.sign(payload, process.env.JWT_REFRESH_SECRET!, { expiresIn: "7d" });
+    res.cookie("refreshToken", refresh, {
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
+        maxAge: 7 * 24 * 60 * 60 * 1000
+    });
 };

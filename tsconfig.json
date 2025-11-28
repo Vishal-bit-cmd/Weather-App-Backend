@@ -8,7 +8,9 @@
     "strict": true,
     "skipLibCheck": true,
     "outDir": "dist",
-    "verbatimModuleSyntax": false
+    "verbatimModuleSyntax": false,
+    "lib": ["ES2022"],        
+    "types": ["node", "express"]         
   },
-  "include": ["src", "src/models/favorites.model.ts"]
+  "include": ["src"]
 }

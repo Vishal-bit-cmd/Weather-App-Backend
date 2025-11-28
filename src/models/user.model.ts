@@ -1,11 +1,20 @@
-import { optional, required } from "joi";
 import { Schema, model } from "mongoose";
 
-const userSchema = new Schema({
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    role: { type: String, enum: ["user", "admin"], default: "user" },
-});
+export interface UserDocument {
+    name: string;
+    email: string;
+    password: string;
+    role: "user" | "admin";
+}
 
-export default model("User", userSchema);
+const userSchema = new Schema<UserDocument>(
+    {
+        name: { type: String, required: true },
+        email: { type: String, required: true, unique: true },
+        password: { type: String, required: true },
+        role: { type: String, enum: ["user", "admin"], default: "user" },
+    },
+    { timestamps: true }
+);
+
+export default model<UserDocument>("User", userSchema);
